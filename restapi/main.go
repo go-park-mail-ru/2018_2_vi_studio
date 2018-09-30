@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"os"
 
-	_ "github.com/lib/pq"
+	//_ "github.com/lib/pq"
 )
 
-var DSN = "host=127.0.0.1 port=5432 user=docker password=docker dbname=docker"
+//var DSN = "host=127.0.0.1 port=5432 user=docker password=docker dbname=docker"
 
 func main() {
 	//db, err := sql.Open("postgres", DSN)

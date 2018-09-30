@@ -1,10 +1,10 @@
-FROM golang:1.11-alpine
+FROM ubuntu:18.04
 
 MAINTAINER Vladimir V. Atamanov
 
 # Обвновление списка пакетов
 
-# RUN apk update
+RUN apt-get -y update
 
 #
 # Установка postgresql
@@ -47,12 +47,10 @@ USER root
 #
 
 # Установка golang
-# RUN apk add golang-1.10 git
-
-RUN apk add git
+RUN apt install -y golang-1.10 git
 
 # Выставляем переменную окружения для сборки проекта
-# ENV GOROOT /usr/lib/go-1.10
+ENV GOROOT /usr/lib/go-1.10
 ENV GOPATH /opt/go
 ENV PATH $GOROOT/bin:$GOPATH/bin:/usr/local/go/bin:$PATH
 
@@ -63,8 +61,8 @@ ADD restapi/ $GOPATH/src/github.com/go-park-mail-ru/2018_2_vi_studio/restapi/
 
 # Подтягиваем зависимости
 RUN go get \
+    github.com/lib/pq \
     github.com/google/uuid
-#    github.com/lib/pq \
 
 # Устанавливаем пакет
 RUN go install ./restapi
