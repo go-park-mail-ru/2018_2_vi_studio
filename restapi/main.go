@@ -26,6 +26,10 @@ func main() {
 	http.HandleFunc("/auth/sign-in", handlerMW(ah.signIn))
 	http.HandleFunc("/auth/sign-up", handlerMW(ah.signUp))
 
+	rh := NewResourceHendler()
+	http.HandleFunc("/resource/leaders", handlerMW(rh.leaders))
+
+
 	fmt.Printf("starting server at :%s\n", port)
 	http.ListenAndServe(":" + port, nil)
 }
