@@ -25,9 +25,9 @@ type SignInToken struct {
 
 type UserSlice []models.User
 
-func NewAuthHandler() AuthHandler {
+func NewAuthHandler(usersDAO *dao.UserDAO) AuthHandler {
 	return AuthHandler{
-		users:  dao.NewUserDAO(),
+		users: usersDAO,
 		tokens: dao.NewTokenDAO(),
 	}
 }
@@ -55,16 +55,16 @@ func (ah *AuthHandler) signIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for id, user := range ah.users.GetAll()  {
+	for _, user := range ah.users.GetAll()  {
 		if user.Nickname == sIUser.Nickname && user.Password == sIUser.Password {
 			w.WriteHeader(http.StatusOK)
 
-			if token, ok := ah.tokens.Get(id); ok {
+			if token, ok := ah.tokens.Get(user.Id); ok {
 				json.NewEncoder(w).Encode(SignInToken{AccessToken:token.UUID})
 			} else {
 				accessToken := uuid.New()
 				ah.tokens.Save(models.Token{
-					UserId: id,
+					UserId: user.Id,
 					UUID:   accessToken,
 				})
 				json.NewEncoder(w).Encode(SignInToken{AccessToken:accessToken})

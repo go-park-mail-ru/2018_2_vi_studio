@@ -13,9 +13,9 @@ func NewTokenDAO() *TokenDAO {
 }
 
 func (md *TokenDAO) GetAll() []models.Token {
-	result := make([]models.Token, len(md.data))
-	for i, obj := range md.data {
-		result[i] = obj
+	result := make([]models.Token, 0, len(md.data))
+	for _, obj := range md.data {
+		result = append(result, obj)
 	}
 	return result
 }

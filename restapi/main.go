@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/go-park-mail-ru/2018_2_vi_studio/restapi/dao"
 	"net/http"
 	"os"
 
@@ -22,12 +23,15 @@ func main() {
 		port = os.Args[1]
 	}
 
-	ah := NewAuthHandler()
+	usersDAO := dao.NewUserDAO()
+
+	ah := NewAuthHandler(usersDAO)
 	http.HandleFunc("/auth/sign-in", handlerMW(ah.signIn))
 	http.HandleFunc("/auth/sign-up", handlerMW(ah.signUp))
 
-	rh := NewResourceHendler()
+	rh := NewResourceHendler(&ah)
 	http.HandleFunc("/resource/leaders", handlerMW(rh.leaders))
+	http.HandleFunc("/resource/profile", handlerMW(rh.profile))
 
 
 	fmt.Printf("starting server at :%s\n", port)

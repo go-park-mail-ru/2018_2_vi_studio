@@ -17,5 +17,5 @@ FROM alpine
 WORKDIR /app
 COPY --from=build-env /go/bin/restapi /app
 
-EXPOSE 8080
-ENTRYPOINT ./restapi 8080
+EXPOSE 80
+ENTRYPOINT ./restapi 80
