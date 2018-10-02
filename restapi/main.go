@@ -28,6 +28,7 @@ func main() {
 	ah := NewAuthHandler(usersDAO)
 	http.HandleFunc("/auth/sign-in", CommonMW(ah.signIn))
 	http.HandleFunc("/auth/sign-up", CommonMW(ah.signUp))
+	http.HandleFunc("/auth/sign-out", CommonMW(ah.signOut))
 
 	rh := NewResourceHendler(&ah)
 	http.HandleFunc("/resource/leaders", CommonMW(rh.leaders))

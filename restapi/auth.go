@@ -2,12 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/go-park-mail-ru/2018_2_vi_studio/restapi/dao"
+	"github.com/go-park-mail-ru/2018_2_vi_studio/restapi/models"
 	"github.com/google/uuid"
 	"net/http"
 	"time"
-
-	"github.com/go-park-mail-ru/2018_2_vi_studio/restapi/dao"
-	"github.com/go-park-mail-ru/2018_2_vi_studio/restapi/models"
 )
 
 type AuthHandler struct {
@@ -104,7 +103,6 @@ func (ah *AuthHandler) signUp(w http.ResponseWriter, r *http.Request) {
 func (ah *AuthHandler) signOut(w http.ResponseWriter, r *http.Request)  {
 	http.SetCookie(w, &http.Cookie{
 		Name: "access_token",
-		Value: "",
 		HttpOnly: true,
 		Secure:false,
 		Path: "/",
