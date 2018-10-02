@@ -26,12 +26,12 @@ func main() {
 	usersDAO := dao.NewUserDAO()
 
 	ah := NewAuthHandler(usersDAO)
-	http.HandleFunc("/auth/sign-in", handlerMW(ah.signIn))
-	http.HandleFunc("/auth/sign-up", handlerMW(ah.signUp))
+	http.HandleFunc("/auth/sign-in", CommonMW(ah.signIn))
+	http.HandleFunc("/auth/sign-up", CommonMW(ah.signUp))
 
 	rh := NewResourceHendler(&ah)
-	http.HandleFunc("/resource/leaders", handlerMW(rh.leaders))
-	http.HandleFunc("/resource/profile", handlerMW(rh.profile))
+	http.HandleFunc("/resource/leaders", CommonMW(rh.leaders))
+	http.HandleFunc("/resource/profile", CommonMW(AuthMW(rh.profile)))
 
 
 	fmt.Printf("starting server at :%s\n", port)

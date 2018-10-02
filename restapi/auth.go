@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/google/uuid"
 	"net/http"
+	"time"
 
 	"github.com/go-park-mail-ru/2018_2_vi_studio/restapi/dao"
 	"github.com/go-park-mail-ru/2018_2_vi_studio/restapi/models"
@@ -27,21 +28,12 @@ type UserSlice []models.User
 
 func NewAuthHandler(usersDAO *dao.UserDAO) AuthHandler {
 	return AuthHandler{
-		users: usersDAO,
+		users:  usersDAO,
 		tokens: dao.NewTokenDAO(),
 	}
 }
 
 func (ah *AuthHandler) signIn(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -55,20 +47,31 @@ func (ah *AuthHandler) signIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, user := range ah.users.GetAll()  {
+	for _, user := range ah.users.GetAll() {
 		if user.Nickname == sIUser.Nickname && user.Password == sIUser.Password {
+			var accessToken uuid.UUID
+
+			if token, ok := ah.tokens.GetToken(user.Id); ok {
+				accessToken = token
+			} else {
+				accessToken = uuid.New()
+				ah.tokens.Set(accessToken, user.Id)
+			}
+
+			http.SetCookie(w, &http.Cookie{
+				Name: "access_token",
+				Value: accessToken.String(),
+				HttpOnly: true,
+				Secure:false,
+				Path: "/",
+			})
+
 			w.WriteHeader(http.StatusOK)
 
-			if token, ok := ah.tokens.Get(user.Id); ok {
-				json.NewEncoder(w).Encode(SignInToken{AccessToken:token.UUID})
-			} else {
-				accessToken := uuid.New()
-				ah.tokens.Save(models.Token{
-					UserId: user.Id,
-					UUID:   accessToken,
-				})
-				json.NewEncoder(w).Encode(SignInToken{AccessToken:accessToken})
-			}
+			json.NewEncoder(w).Encode(models.User{
+				Nickname:user.Nickname,
+				Email:user.Email,
+			})
 			return
 		}
 	}
@@ -76,15 +79,6 @@ func (ah *AuthHandler) signIn(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ah *AuthHandler) signUp(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -104,5 +98,17 @@ func (ah *AuthHandler) signUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.WriteHeader(http.StatusOK)
+}
+
+func (ah *AuthHandler) signOut(w http.ResponseWriter, r *http.Request)  {
+	http.SetCookie(w, &http.Cookie{
+		Name: "access_token",
+		Value: "",
+		HttpOnly: true,
+		Secure:false,
+		Path: "/",
+		Expires: time.Unix(0, 0),
+	})
 	w.WriteHeader(http.StatusOK)
 }
