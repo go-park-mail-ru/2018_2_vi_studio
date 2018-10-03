@@ -10,12 +10,12 @@ ADD . .
 RUN go get github.com/google/uuid
 
 # Устанавливаем пакет
-RUN go install ./restapi
+RUN go install
 
 # Запуск бинарника
 FROM alpine
 WORKDIR /app
-COPY --from=build-env /go/bin/restapi /app
+COPY --from=build-env /go/bin/2018_2_vi_studio /app
 
 EXPOSE 80
-ENTRYPOINT ./restapi 80
+ENTRYPOINT ./2018_2_vi_studio 80

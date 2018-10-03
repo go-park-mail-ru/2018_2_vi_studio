@@ -17,8 +17,11 @@ func NewSessionIMS() *SessionIMS {
 }
 
 func (md *SessionIMS) ByToken(token uuid.UUID) (Session, bool) {
-	result, ok := md.uuidMap[token]
-	return *result, ok
+	if result, ok := md.uuidMap[token]; ok {
+		return *result, true
+	}
+
+	return Session{}, false
 }
 
 func (md *SessionIMS) ByUserId(id int) (Session, bool) {
