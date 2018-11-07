@@ -61,6 +61,8 @@ func (uh *UsersHandler) Get(w http.ResponseWriter, r *http.Request) {
 
 	if !ok {
 		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(NewError("user is not authorized"))
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)

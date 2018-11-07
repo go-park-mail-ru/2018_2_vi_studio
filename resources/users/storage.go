@@ -91,9 +91,9 @@ func (us *UserStorage) Add(obj User) error {
 func (us *UserStorage) Auth(user UserAuth) (*User, error) {
 	var result User
 	err := us.db.QueryRow(
-		"SELECT nickname, email, points FROM users WHERE nickname = $1 and password = $2",
+		"SELECT id, nickname, email, points FROM users WHERE nickname = $1 and password = $2",
 		user.Nickname, user.Password,
-	).Scan(&result.Nickname, &result.Email, &result.Points)
+	).Scan(&result.Id, &result.Nickname, &result.Email, &result.Points)
 
 	if err == nil {
 		return &result, nil

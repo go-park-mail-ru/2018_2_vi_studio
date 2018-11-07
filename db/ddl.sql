@@ -4,11 +4,11 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 ----------- users -----------
 
 CREATE TABLE IF NOT EXISTS users (
-  id  SERIAL PRIMARY KEY,
+  id       SERIAL PRIMARY KEY,
   nickname CITEXT NOT NULL UNIQUE,
   email    CITEXT NOT NULL UNIQUE,
   password TEXT   NOT NULL,
-  points   INTEGER
+  points   INTEGER DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS sessions (

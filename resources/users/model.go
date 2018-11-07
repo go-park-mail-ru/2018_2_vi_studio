@@ -5,15 +5,16 @@ type User struct {
 	Nickname *string `json:"nickname"`
 	Email    *string `json:"email"`
 	Password *string `json:"password,omitempty"`
-	Points   *int    `json:"points,omitempty"`
+	Points   *int    `json:"points"`
 }
 
 func (u User)IsValid() bool {
-	return *u.Id >= 0 &&
-		len(*u.Nickname) > 3 && len(*u.Nickname) < 32 &&
+	if u.Nickname == nil || u.Email == nil || u.Password == nil {
+		return false
+	}
+	return len(*u.Nickname) > 3 && len(*u.Nickname) < 32 &&
 		len(*u.Email) > 3 && len(*u.Email) < 64 &&
-		len(*u.Password) > 3 && len(*u.Password) < 32 &&
-		*u.Points >= 0
+		len(*u.Password) > 3 && len(*u.Password) < 32
 }
 
 type Leader struct {

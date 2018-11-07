@@ -1,6 +1,7 @@
 package main
 
 import (
+	"2018_2_vi_studio_server/game"
 	"2018_2_vi_studio_server/handlers"
 	mw "2018_2_vi_studio_server/middleware"
 	"2018_2_vi_studio_server/resources"
@@ -30,4 +31,10 @@ func SetRoutes() {
 
 	usersHandler := handlers.NewUsersHandler(sb)
 	http.HandleFunc("/user", commonMW(usersHandler.ServeHTTP))
+
+	gm := game.NewGame()
+
+	gameHandler := handlers.NewGameHandler(gm)
+	http.HandleFunc("/game-ws", gameHandler.ServeHTTP)
+
 }

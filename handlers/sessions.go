@@ -22,6 +22,7 @@ func NewSessionsHandler(sb *resources.StorageBundle) *SessionHandler  {
 
 func (sh *SessionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
+
 	case "POST":
 		sh.Create(w, r)
 	case "DELETE":

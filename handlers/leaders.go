@@ -10,8 +10,8 @@ type LeadersHandler struct {
 	sb *resources.StorageBundle
 }
 
-func NewLeadersHandler(sb *resources.StorageBundle) LeadersHandler{
-	return LeadersHandler{
+func NewLeadersHandler(sb *resources.StorageBundle) *LeadersHandler{
+	return &LeadersHandler{
 		sb: sb,
 	}
 }

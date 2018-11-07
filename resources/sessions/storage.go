@@ -38,7 +38,7 @@ func (ss *SessionStorage) ByUserId(id int) (*Session, error) {
 }
 
 func (ss *SessionStorage) Add(obj Session) error {
-	_, err := ss.db.Exec("INSERT INTO sessions (user_id, token) VALUES ($1, $2) ON CONFLICT DO UPDATE SET token = $2 WHERE user_id = $1")
+	_, err := ss.db.Exec("INSERT INTO sessions (user_id, token) VALUES ($1, $2) ON CONFLICT(user_id) DO UPDATE SET token = $2", obj.UserId, obj.AccessToken)
 	if err == nil {
 		return nil
 	}
