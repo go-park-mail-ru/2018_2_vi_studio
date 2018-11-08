@@ -5,10 +5,11 @@ type User struct {
 	Nickname *string `json:"nickname"`
 	Email    *string `json:"email"`
 	Password *string `json:"password,omitempty"`
+	Avatar   *string `json:"avatar,omitempty"`
 	Points   *int    `json:"points"`
 }
 
-func (u User)IsValid() bool {
+func (u User) IsValid() bool {
 	if u.Nickname == nil || u.Email == nil || u.Password == nil {
 		return false
 	}
@@ -22,7 +23,7 @@ type Leader struct {
 	Points   int    `json:"points"`
 }
 
-func (l Leader)IsValid() bool {
+func (l Leader) IsValid() bool {
 	return len(l.Nickname) > 3 && len(l.Nickname) < 32 && l.Points >= 0
 }
 
@@ -31,7 +32,7 @@ type UserAuth struct {
 	Password *string `json:"password"`
 }
 
-func (u UserAuth)IsValid() bool {
+func (u UserAuth) IsValid() bool {
 	return len(*u.Nickname) > 3 && len(*u.Nickname) < 32 &&
 		len(*u.Password) > 3 && len(*u.Password) < 32
 }

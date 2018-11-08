@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
   nickname CITEXT NOT NULL UNIQUE,
   email    CITEXT NOT NULL UNIQUE,
   password TEXT   NOT NULL,
+  avatar   TEXT   NULL,
   points   INTEGER DEFAULT 0
 );
 

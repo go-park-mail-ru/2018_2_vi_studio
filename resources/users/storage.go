@@ -63,9 +63,9 @@ func (us *UserStorage) ByNickname(nickname string) (*User, error) {
 func (us *UserStorage) ById(id int) (*User, error) {
 	var result User
 	err := us.db.QueryRow(
-		"SELECT nickname, email, points FROM users WHERE id = $1",
+		"SELECT nickname, email, points, avatar FROM users WHERE id = $1",
 		id,
-	).Scan(&result.Nickname, &result.Email, &result.Points)
+	).Scan(&result.Nickname, &result.Email, &result.Points, &result.Avatar)
 	if err == nil {
 		return &result, nil
 	}
@@ -80,6 +80,16 @@ func (us *UserStorage) Add(obj User) error {
 		obj.Email,
 		obj.Password,
 	)
+
+	if err != nil {
+		return ErrUnknown
+	}
+
+	return nil
+}
+
+func (us *UserStorage) AddAvatar(id int, avatar string) error {
+	_, err := us.db.Exec("UPDATE users SET avatar=$1 WHERE id=$2", avatar, id)
 
 	if err != nil {
 		return ErrUnknown

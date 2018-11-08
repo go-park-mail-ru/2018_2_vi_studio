@@ -61,7 +61,7 @@ func (sh *SessionHandler) Create(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		token = *session.AccessToken
 	} else if err == sessions.ErrNotFound {
-		token = uuid.New()
+		token, _ = uuid.NewRandom()
 		sh.sb.Sessions.Add(sessions.Session{AccessToken: &token, UserId: user.Id})
 	} else {
 		w.WriteHeader(http.StatusUnauthorized)

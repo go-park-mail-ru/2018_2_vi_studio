@@ -32,6 +32,10 @@ func SetRoutes() {
 	usersHandler := handlers.NewUsersHandler(sb)
 	http.HandleFunc("/user", commonMW(usersHandler.ServeHTTP))
 
+	http.Handle("/media/", http.FileServer(http.Dir(".")))
+	userAvatarHandler := handlers.NewUserAvatarHandler(sb)
+	http.HandleFunc("/user/avatar", commonMW(userAvatarHandler.ServeHTTP))
+
 	gm := game.NewGame()
 
 	gameHandler := handlers.NewGameHandler(gm)

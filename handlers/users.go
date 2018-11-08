@@ -24,6 +24,8 @@ func (uh *UsersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		uh.Create(w, r)
 	case "GET":
 		uh.Get(w, r)
+	case "PUT":
+		w.WriteHeader(http.StatusOK)
 	default:
 		w.WriteHeader(http.StatusNotFound)
 	}
@@ -70,5 +72,7 @@ func (uh *UsersHandler) Get(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(users.User{
 		Nickname: user.Nickname,
 		Email:    user.Email,
+		Avatar:   user.Avatar,
+		Points:   user.Points,
 	})
 }

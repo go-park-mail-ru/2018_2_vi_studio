@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"go.uber.org/zap"
 	"net/http"
 )
@@ -23,6 +24,10 @@ func NewResponseWriter(w http.ResponseWriter) ResponseWriter  {
 }
 
 func Logger(ctx context.Context) *zap.Logger {
+	if ctx.Value(loggerKey) == nil {
+		panic(errors.New("logger not available"))
+	}
+
 	return ctx.Value(loggerKey).(*zap.Logger)
 }
 
