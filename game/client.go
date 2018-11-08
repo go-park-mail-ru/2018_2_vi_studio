@@ -83,12 +83,13 @@ Clients: {
 // game-event-GameStart
 event: GameStart
 Clients: {
-    Players: [
+    players: [
         {   id int // local (game) id
             username string
             avatar string // image url
         }
-    ]
+    ],
+    clientId int
 }
 
 // game-event-StartTry
