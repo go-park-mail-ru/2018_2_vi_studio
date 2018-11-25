@@ -1,0 +1,110 @@
+---
+openapi: 3.0.1
+info:
+  title: Server
+  description: defaultDescription
+  version: "0.1"
+servers:
+- url: https://20182vistudio-uiffpspztm.now.sh
+paths:
+  /session:
+    post:
+      description: Auto generated using Swagger Inspector
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body'
+            examples:
+              0:
+                value: |-
+                  {
+                      "nickname": "Viewsharp",
+                      "password": "lol"
+                  }
+              1:
+                value: |-
+                  {
+                      "nickname": "Viewsharp",
+                      "password": "lodl"
+                  }
+      responses:
+        200:
+          description: Auto generated using Swagger Inspector
+          content:
+            text/plain; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+    delete:
+      description: Auto generated using Swagger Inspector
+      responses:
+        200:
+          description: Auto generated using Swagger Inspector
+  /leader:
+    get:
+      description: Auto generated using Swagger Inspector
+      responses:
+        200:
+          description: Auto generated using Swagger Inspector
+          content:
+            text/plain; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+  /user:
+    get:
+      description: Auto generated using Swagger Inspector
+      responses:
+        200:
+          description: Auto generated using Swagger Inspector
+          content:
+            text/plain; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+    post:
+      description: Auto generated using Swagger Inspector
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body_1'
+            examples:
+              0:
+                value: |-
+                  {
+                      "nickname": "Viewsharp",
+                      "password": "lol",
+                      "email": "sdfad@mail.ru"
+                  }
+              1:
+                value: |-
+                  {
+                      "nickname": "Viewsharp",
+                      "password": "lol",
+                      "email": "sdfad@mail.ru"
+                  }
+      responses:
+        200:
+          description: Auto generated using Swagger Inspector
+        409:
+          description: Auto generated using Swagger Inspector
+components:
+  schemas:
+    body_1:
+      type: object
+      properties:
+        password:
+          type: string
+        nickname:
+          type: string
+        email:
+          type: string
+    body:
+      type: object
+      properties:
+        password:
+          type: string
+        nickname:
+          type: string
