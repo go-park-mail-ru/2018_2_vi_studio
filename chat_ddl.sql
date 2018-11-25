@@ -1,0 +1,24 @@
+DROP TABLE IF EXISTS chat_member;
+DROP TABLE IF EXISTS messages;
+DROP TABLE IF EXISTS chat;
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE IF NOT EXISTS chat (
+  id SERIAL PRIMARY KEY,
+  name TEXT
+);
+
+CREATE TABLE IF NOT EXISTS messages (
+  sender UUID NOT NULL,
+  chat INTEGER NOT NULL REFERENCES chat(id),
+  created TIMESTAMP DEFAULT now(),
+  edited BOOLEAN DEFAULT false NOT NULL,
+  text TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS chat_member (
+  chat_id INTEGER REFERENCES chat (id),
+  user_uid UUID NOT NULL
+);
+
