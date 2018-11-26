@@ -104,7 +104,7 @@ func (us *UserStorage) Auth(user UserAuth) (*User, error) {
 
 func (us *UserStorage) Count() (int, error) {
 	var result int
-	err := us.db.QueryRow("SELECT count(*) FROM users").Scan(result)
+	err := us.db.QueryRow("SELECT count(*) FROM users").Scan(&result)
 
 	if err != nil {
 		return 0, ErrUnknown

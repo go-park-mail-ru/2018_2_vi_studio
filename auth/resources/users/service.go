@@ -107,9 +107,26 @@ func (au *UserService) AddAvatar(ctx context.Context, request *proto.AddAvatarRe
 }
 
 func (au *UserService) Leaders(ctx context.Context, request *proto.LeadersRequest) (*proto.LeadersResponse, error) {
-	// TODO: rewrite
+	leaders, err := au.Users.Leaders(int(request.Limit), int(request.Offset))
+	if err != nil {
+		return &proto.LeadersResponse{}, nil
+	}
 
-	//_, err := au.Users.Leaders(int(request.Limit), int(request.Offset))
+	count, err := au.Users.Count()
+	if err != nil {
+		return &proto.LeadersResponse{}, nil
+	}
 
-	return &proto.LeadersResponse{}, nil
+	users := make([]*proto.User, 0, request.Limit)
+	for _, leader := range *leaders {
+		users = append(users, &proto.User{
+			Nickname: *leader.Nickname,
+			Points:   int32(*leader.Points),
+		})
+	}
+
+	return &proto.LeadersResponse{
+		Users: users,
+		Count: int32(count),
+	}, nil
 }

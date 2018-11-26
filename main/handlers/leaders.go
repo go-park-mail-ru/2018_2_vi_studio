@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"main/middleware"
 	"main/proto"
+	"math"
 	"net/http"
 	"strconv"
 )
@@ -32,18 +33,13 @@ func (lh *LeadersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 type GetLeadersResponse struct {
 	Leaders []*proto.User `json:"leaders"`
-	Count int `json:"count"`
+	PageCount int `json:"pageCount"`
 }
 
 // -------------------------------------------------- Handlers --------------------------------------------------
 
 func (lh *LeadersHandler) Get(w http.ResponseWriter, r *http.Request)  {
 	const limit = 10
-
-	if r.Method != "GET" {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
 
 	page := 1
 	if pageString, ok := r.URL.Query()["page"]; ok {
@@ -66,7 +62,7 @@ func (lh *LeadersHandler) Get(w http.ResponseWriter, r *http.Request)  {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(GetLeadersResponse{
 		Leaders: response.Users,
-		Count: int(response.Count),
+		PageCount: int(math.Ceil(float64(response.Count) / limit)),
 	})
 
 	if err != nil {
