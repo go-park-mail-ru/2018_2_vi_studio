@@ -1,37 +1,61 @@
 package game
 
-import "fmt"
+import (
+	"go.uber.org/zap"
+	"time"
+)
+
+const (
+	RoomSize = 2
+
+	RoundTimeInterval = 15 * time.Second
+
+	ClientTimeOut = 15 * time.Minute
+
+	MaxMessageSize = 1024
+)
 
 type Game struct {
-	queue         ClientQueue
-	newClientChan chan *Client
+	queue  *ClientQueue
+	logger *zap.Logger
 }
 
-func NewGame() *Game {
-	result := &Game{
-		newClientChan: make(chan *Client),
+func NewGame(logger *zap.Logger) *Game {
+	return &Game{
+		queue:  NewClientQueue(),
+		logger: logger,
 	}
-	go result.Loop()
-	return result
 }
 
-func (game *Game)Loop() {
-	for {
-		client := <- game.newClientChan
+func (game *Game) waitClientGameStart(client *Client) {
+	select {
+	case message := <-client.Output():
+		if message.Event != EventReadyToPlay {
+			game.logger.Error("Wrong client event")
+			return
+		}
+
 		if game.queue.len() > 0 {
-			NewGameRoom([]*Client{client, game.queue.pop()}) // !!!!!!!!
+			clients := make([]*Client, 0, RoomSize)
+			clients = append(clients, client)
+
+			for i := 1; i < RoomSize; i++ {
+				clients = append(clients, game.queue.pop())
+			}
+
+			NewGameRoom(clients, game.logger)
 		} else {
 			game.queue.push(client)
 		}
 
-		fmt.Println(game.queue.len())
-
 		for i, client := range game.queue.Clients {
-			client.QueuePosition(i)
+			client.Input(NewQueuePositionMessage(i))
 		}
+	case <-time.After(ClientTimeOut):
+		return
 	}
 }
 
-func (game *Game)AddClient(client *Client)  {
-	game.newClientChan <- client
+func (game *Game) AddClient(client *Client) {
+	go game.waitClientGameStart(client)
 }

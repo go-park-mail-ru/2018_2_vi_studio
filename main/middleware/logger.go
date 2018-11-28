@@ -37,7 +37,7 @@ func WithLogger(ctx context.Context, logger *zap.Logger) context.Context {
 
 func LoggerMW(handlerFunc http.HandlerFunc) http.HandlerFunc {
 	logger, _ := zap.NewProduction()
-	defer logger.Sync()
+	//defer logger.Sync()
 	return func(w http.ResponseWriter, r *http.Request) {
 		sugar := logger.Sugar()
 		customRW := NewResponseWriter(w)

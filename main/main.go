@@ -9,6 +9,7 @@ import (
 	mw "main/middleware"
 	"main/proto"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -19,11 +20,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer grcpConn.Close()
+
+	defer func() {
+		err := grcpConn.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	sessionService := proto.NewSessionServiceClient(grcpConn)
 	userService := proto.NewUserServiceClient(grcpConn)
-	serviceBundle := proto.ServiceBundle{
+	authServices := proto.AuthServices{
 		Sessions: sessionService,
 		Users: userService,
 	}
@@ -33,23 +40,28 @@ func main() {
 	}
 
 	// routing (begin)
-	leadersHandler := handlers.NewLeadersHandler(serviceBundle)
+	leadersHandler := handlers.NewLeadersHandler(authServices)
 	http.HandleFunc("/leader", commonMW(leadersHandler.ServeHTTP))
 
-	sessionsHandler := handlers.NewSessionsHandler(serviceBundle)
+	sessionsHandler := handlers.NewSessionsHandler(authServices)
 	http.HandleFunc("/session", commonMW(sessionsHandler.ServeHTTP))
 
-	usersHandler := handlers.NewUsersHandler(serviceBundle)
+	usersHandler := handlers.NewUsersHandler(authServices)
 	http.HandleFunc("/user", commonMW(usersHandler.ServeHTTP))
 
-	userAvatarHandler := handlers.NewUserAvatarHandler(serviceBundle)
+	userAvatarHandler := handlers.NewUserAvatarHandler(authServices)
 	http.HandleFunc("/user/avatar", commonMW(userAvatarHandler.ServeHTTP))
 
 	http.Handle("/media/", http.FileServer(http.Dir(".")))
 	// routing (end)
 
-	fmt.Println("starting server at :8000")
-	err = http.ListenAndServe(":8000", nil)
+	port := "8000"
+	if len(os.Args) > 1 {
+		port = os.Args[1]
+	}
+
+	fmt.Printf("starting server at :%s\n", port)
+	err = http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		log.Fatal(err)
 	}

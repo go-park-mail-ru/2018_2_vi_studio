@@ -11,10 +11,10 @@ import (
 )
 
 type SessionHandler struct {
-	sb proto.ServiceBundle
+	sb proto.AuthServices
 }
 
-func NewSessionsHandler(sb proto.ServiceBundle) *SessionHandler {
+func NewSessionsHandler(sb proto.AuthServices) *SessionHandler {
 	return &SessionHandler{
 		sb: sb,
 	}
@@ -107,11 +107,18 @@ func (sh *SessionHandler) Create(w http.ResponseWriter, r *http.Request) {
 	})
 
 	// Write response
-	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(CreateSessionResponse{
+	body, err := CreateSessionResponse{
 		Nickname: user.Nickname,
 		Email:    user.Email,
-	})
+	}.MarshalJSON()
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write(body)
 	if err != nil {
 		middleware.Logger(r.Context()).Error(err.Error())
 	}

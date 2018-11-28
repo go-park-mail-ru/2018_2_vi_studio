@@ -2,22 +2,49 @@ package main
 
 import (
 	"fmt"
+	"game/proto"
 	_ "github.com/lib/pq"
+	"google.golang.org/grpc"
 	"log"
 	"net/http"
 	"os"
 )
 
+type AuthServices struct {
+	Sessions proto.SessionServiceClient
+	Users    proto.UserServiceClient
+}
+
 func main() {
-	port := "8080"
+	grcpConn, err := grpc.Dial(
+		"127.0.0.1:9000",
+		grpc.WithInsecure(),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer func() {
+		err := grcpConn.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	authServices := &AuthServices{
+		Sessions: proto.NewSessionServiceClient(grcpConn),
+		Users: proto.NewUserServiceClient(grcpConn),
+	}
+
+	http.Handle("/", NewGameHandler(authServices))
+
+	port := "8001"
 	if len(os.Args) > 1 {
 		port = os.Args[1]
 	}
 
-	SetRoutes()
-
 	fmt.Printf("starting server at :%s\n", port)
-	err := http.ListenAndServe(":"+port, nil)
+	err = http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		log.Fatal(err)
 	}

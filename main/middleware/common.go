@@ -6,7 +6,7 @@ import (
 	"regexp"
 )
 
-var regexOrigin, _ = regexp.Compile(`^https?\:\/\/((2018\-2\-vi\-studio\-\w+\.now\.sh)|((127\.0\.0\.1|localhost)(\:\d+)?))$`)
+var regexOrigin, _ = regexp.Compile(`^https?\:\/\/((2018\-2\-vi\-studio\-\w+\.now\.sh)|((127\.0\.0\.1|localhost|95\.163\.180\.8)(\:\d+)?))$`)
 
 func CorsMW(handlerFunc http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

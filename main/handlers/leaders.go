@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
 	"main/middleware"
 	"main/proto"
 	"math"
@@ -11,10 +10,10 @@ import (
 )
 
 type LeadersHandler struct {
-	sb proto.ServiceBundle
+	sb proto.AuthServices
 }
 
-func NewLeadersHandler(sb proto.ServiceBundle) *LeadersHandler {
+func NewLeadersHandler(sb proto.AuthServices) *LeadersHandler {
 	return &LeadersHandler{
 		sb: sb,
 	}
@@ -59,12 +58,18 @@ func (lh *LeadersHandler) Get(w http.ResponseWriter, r *http.Request)  {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
-	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(GetLeadersResponse{
+	body, err := GetLeadersResponse{
 		Leaders: response.Users,
 		PageCount: int(math.Ceil(float64(response.Count) / limit)),
-	})
+	}.MarshalJSON()
 
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write(body)
 	if err != nil {
 		middleware.Logger(r.Context()).Error(err.Error())
 	}

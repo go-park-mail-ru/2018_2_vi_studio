@@ -1,7 +1,6 @@
 package proto
 
-
-type ServiceBundle struct {
+type AuthServices struct {
 	Sessions SessionServiceClient
 	Users UserServiceClient
 }

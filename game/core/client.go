@@ -1,130 +1,93 @@
 package game
 
 import (
-	"game/core/messages"
+	"game/proto"
 	"github.com/gorilla/websocket"
+	"go.uber.org/zap"
+	"time"
 )
 
 type Client struct {
-	ws   *websocket.Conn
-	loop bool
-	game *Game
+	user    *proto.User
+	ws      *websocket.Conn
+	runLoop bool
+	logger  *zap.Logger
+	input   chan Message
+	output  chan Message
 }
 
-func NewClient(ws *websocket.Conn, game *Game) *Client {
+func NewClient(user *proto.User, ws *websocket.Conn, logger *zap.Logger) *Client {
 	result := &Client{
-		ws:   ws,
-		game: game,
-		loop: true,
+		user:   user,
+		ws:     ws,
+		logger: logger,
+		input:  make(chan Message),
+		output: make(chan Message),
 	}
-	go result.Loop()
+	go result.Init()
 	return result
 }
 
-// TODO: rewrite
+func (client *Client) Input(message Message) {
+	client.input <- message
+}
 
-func (client *Client) Loop() {
-	for client.loop {
-		var message messages.Message
+func (client *Client) Output() <-chan Message {
+	return client.output
+}
+
+func (client *Client) readPump(wsReadChan chan<- Message) {
+	defer func() {
+		_ = client.ws.Close()
+		close(wsReadChan)
+	}()
+
+	// init ws connect
+	client.ws.SetReadLimit(MaxMessageSize)
+	err := client.ws.SetReadDeadline(time.Now().Add(ClientTimeOut))
+	client.ws.SetPongHandler(func(string) error { return client.ws.SetReadDeadline(time.Now().Add(ClientTimeOut)) })
+	if err != nil {
+		client.logger.Error(err.Error())
+	}
+
+	// read from web socket to channel
+	for {
+		var message Message
+
 		err := client.ws.ReadJSON(&message)
 		if err != nil {
-			return // TODO: Handle error
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				client.logger.Error(err.Error())
+			}
+			break
 		}
 
-		switch message.Event {
-		case "ReadyToPlay":
-			client.readyToPlay()
-		case "DoneTry":
-			client.doneTry()
-		default:
-		}
+		wsReadChan <- message
 	}
 }
 
-func (client *Client) QueuePosition(position int) {
-	client.ws.WriteJSON(messages.NewQueuePositionMSG(position))
+func (client *Client) Init() {
+	wsReadChan := make(chan Message)
+
+	go client.readPump(wsReadChan)
+
+	// web socket read loop
+	for {
+		select {
+		case message := <-wsReadChan:
+			client.output <- message
+		case message := <-client.input:
+			err := client.ws.WriteJSON(message)
+			if err != nil {
+				client.logger.Error(err.Error())
+			}
+		case <-time.After(ClientTimeOut):
+			err := client.ws.Close()
+			if err != nil {
+				client.logger.Error(err.Error())
+			}
+
+			break
+		}
+	}
 }
-
-func (client *Client) GameStart() {
-	client.ws.WriteJSON(messages.NewGameStartMSG())
-}
-
-func (client *Client) StartTry() {
-	client.ws.WriteJSON(messages.NewQueuePositionMSG(0))
-}
-
-func (client *Client) TimeOut() {
-	client.ws.WriteJSON(messages.NewQueuePositionMSG(0))
-}
-
-func (client *Client) GameOver() {
-	client.ws.WriteJSON(messages.NewGameOverMSG())
-}
-
-func (client *Client) readyToPlay() {
-	client.game.AddClient(client)
-}
-
-func (client *Client) doneTry() {
-	client.game.AddClient(client)
-}
-
-/*
------------------------------------------- RESPONSES ------------------------------------------
-
-// game-event-QueuePosition
-event: QueuePosition
-Clients: {
-    position int
-}
-
-// game-event-GameStart
-event: GameStart
-Clients: {
-    players: [
-        {   id int // local (game) id
-            username string
-            avatar string // image url
-        }
-    ],
-    clientId int
-}
-
-// game-event-StartTry
-event: StartTry
-Clients: {
-    playerId int
-    tile: {
-        type int
-    }
-}
-
-// game-event-TimeOut
-event: TimeOut
-Clients: {
-}
-
-// game-event-GameOver
-event: GameOver
-Clients: {
-    players {
-        id int
-        points int
-    }
-}
-
------------------------------------------- REQUESTS ------------------------------------------
-
-// game-event-ReadyToPlay
-event: ReadyToPlay
-Clients: {
-}
-
-// game-event-DoneTry
-event: DoneTry
-Clients: {
-    row int
-    col int
-    rotation int
-}
- */

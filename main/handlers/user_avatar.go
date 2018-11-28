@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	//"main/middleware"
 	"io"
 	"main/proto"
 	"net/http"
@@ -10,10 +9,10 @@ import (
 const chunkSize = 1024
 
 type UserAvatarHandler struct {
-	sb proto.ServiceBundle
+	sb proto.AuthServices
 }
 
-func NewUserAvatarHandler(sb proto.ServiceBundle) *UserAvatarHandler {
+func NewUserAvatarHandler(sb proto.AuthServices) *UserAvatarHandler {
 	return &UserAvatarHandler{
 		sb: sb,
 	}
