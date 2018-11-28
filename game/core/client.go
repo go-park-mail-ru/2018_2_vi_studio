@@ -54,11 +54,17 @@ func (client *Client) readPump(wsReadChan chan<- Message) {
 	for {
 		var message Message
 
-		err := client.ws.ReadJSON(&message)
+		_, bytes, err := client.ws.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				client.logger.Error(err.Error())
 			}
+			break
+		}
+
+		err = message.UnmarshalJSON(bytes)
+		if err != nil {
+			client.logger.Error(err.Error())
 			break
 		}
 
@@ -77,7 +83,12 @@ func (client *Client) Init() {
 		case message := <-wsReadChan:
 			client.output <- message
 		case message := <-client.input:
-			err := client.ws.WriteJSON(message)
+			bytes, err := message.MarshalJSON()
+			if err != nil {
+				client.logger.Error(err.Error())
+			}
+
+			err = client.ws.WriteMessage(0, bytes)
 			if err != nil {
 				client.logger.Error(err.Error())
 			}
