@@ -101,6 +101,8 @@ func easyjson84c0690eDecodeMainHandlers1(in *jlexer.Lexer, out *GetUserResponse)
 			out.Email = string(in.String())
 		case "points":
 			out.Points = int(in.Int())
+		case "avatar":
+			out.Avatar = string(in.String())
 		default:
 			in.SkipRecursive()
 		}
@@ -144,6 +146,16 @@ func easyjson84c0690eEncodeMainHandlers1(out *jwriter.Writer, in GetUserResponse
 			out.RawString(prefix)
 		}
 		out.Int(int(in.Points))
+	}
+	{
+		const prefix string = ",\"avatar\":"
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
+		out.String(string(in.Avatar))
 	}
 	out.RawByte('}')
 }

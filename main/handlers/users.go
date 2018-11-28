@@ -25,7 +25,7 @@ func (uh *UsersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "GET":
 		uh.Get(w, r)
 	case "PUT":
-		w.WriteHeader(http.StatusOK)
+		uh.Get(w, r)
 	default:
 		w.WriteHeader(http.StatusNotFound)
 	}
@@ -50,6 +50,7 @@ type GetUserResponse struct {
 	Nickname string `json:"nickname"`
 	Email    string `json:"email"`
 	Points   int    `json:"points"`
+	Avatar	string `json:"avatar"`
 }
 
 // -------------------------------------------------- Handlers --------------------------------------------------
@@ -121,6 +122,7 @@ func (uh *UsersHandler) Get(w http.ResponseWriter, r *http.Request) {
 		Nickname: user.Nickname,
 		Email:    user.Email,
 		Points:   int(user.Points),
+		Avatar: user.Avatar,
 	}.MarshalJSON()
 
 	if err != nil {

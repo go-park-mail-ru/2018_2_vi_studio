@@ -74,8 +74,8 @@ func (us *UserStorage) Add(obj User) error {
 	return nil
 }
 
-func (us *UserStorage) AddAvatar(id int, avatar string) error {
-	_, err := us.db.Exec("UPDATE users SET avatar=$1 WHERE id=$2", avatar, id)
+func (us *UserStorage) AddAvatar(uid uuid.UUID, avatar string) error {
+	_, err := us.db.Exec("UPDATE users SET avatar=$1 WHERE uid=$2", avatar, uid)
 
 	if err != nil {
 		return ErrUnknown

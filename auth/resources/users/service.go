@@ -30,19 +30,6 @@ func (au *UserService) BySessionToken(ctx context.Context, token *proto.UUID) (*
 	}, err
 }
 
-//func (au *UserService) ByNickname(ctx context.Context, nickname string) (*User, error) {
-//	var result User
-//	err := us.db.QueryRow(
-//		"SELECT nickname, email, points FROM users WHERE nickname = $1",
-//		nickname,
-//	).Scan(&result.Nickname, &result.Email, &result.Points)
-//	if err == nil {
-//		return &result, nil
-//	}
-//
-//	return nil, ErrUnknown
-//}
-
 func (au *UserService) ByUID(ctx context.Context, userUID *proto.UUID) (*proto.User, error) {
 	uid, _ := uuid.Parse(userUID.Value)
 	user, err := au.Users.ByUID(uid)
@@ -101,7 +88,13 @@ func (au *UserService) SignIn(ctx context.Context, user *proto.UserSignIn) (*pro
 }
 
 func (au *UserService) AddAvatar(ctx context.Context, request *proto.AddAvatarRequest) (*proto.Nothing, error) {
-	// TODO: rewrite
+	tokenUUID, _ := uuid.Parse(request.UserUID.Value)
+
+	err := au.Users.AddAvatar(tokenUUID, request.Name)
+
+	if err != nil {
+		return &proto.Nothing{}, err
+	}
 
 	return &proto.Nothing{}, nil
 }
