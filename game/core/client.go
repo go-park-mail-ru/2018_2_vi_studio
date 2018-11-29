@@ -88,7 +88,7 @@ func (client *Client) Init() {
 				client.logger.Error(err.Error())
 			}
 
-			err = client.ws.WriteMessage(0, bytes)
+			err = client.ws.WriteMessage(websocket.TextMessage, bytes)
 			if err != nil {
 				client.logger.Error(err.Error())
 			}
