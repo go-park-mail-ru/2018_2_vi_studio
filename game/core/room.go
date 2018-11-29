@@ -88,7 +88,6 @@ func (room *Room) move(playerId int, player *Client) {
 			}
 
 		case <-time.After(RoundTimeInterval):
-			room.moveNumber++
 			return
 		}
 	}
