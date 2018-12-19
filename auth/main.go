@@ -13,7 +13,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const DSN = "host=127.0.0.1 port=5432 user=docker password=docker dbname=docker sslmode=disable"
+const DSN = "host=127.0.0.1 port=5432 user=docker password=docker dbname=docker"
 
 func main() {
 	db, err := sql.Open("postgres", DSN)
