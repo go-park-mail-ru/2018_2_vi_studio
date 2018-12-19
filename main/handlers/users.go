@@ -109,7 +109,7 @@ func (uh *UsersHandler) Get(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusUnauthorized)
 		_, err = w.Write(body)
 		if err != nil {
 			middleware.Logger(r.Context()).Error(err.Error())

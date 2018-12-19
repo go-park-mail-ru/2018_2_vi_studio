@@ -22,7 +22,7 @@ func main() {
 		panic(err)
 	}
 
-	lis, err := net.Listen("tcp", ":9000")
+	lis, err := net.Listen("tcp", ":8080")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,7 +35,7 @@ func main() {
 	proto.RegisterSessionServiceServer(server, sessionService)
 	proto.RegisterUserServiceServer(server, userService)
 
-	fmt.Println("starting server at :9000")
+	fmt.Println("starting server at :8080")
 
 	err = server.Serve(lis)
 	if err != nil {
