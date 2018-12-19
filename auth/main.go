@@ -13,7 +13,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const DSN = "host=127.0.0.1 port=5432 user=docker password=docker dbname=docker"
+const DSN = "host=127.0.0.1 port=5432 user=docker password=docker dbname=docker sslmode=disable"
 
 func main() {
 	db, err := sql.Open("postgres", DSN)
@@ -22,7 +22,7 @@ func main() {
 		panic(err)
 	}
 
-	lis, err := net.Listen("tcp", ":9000")
+	lis, err := net.Listen("tcp", ":8080")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,7 +35,7 @@ func main() {
 	proto.RegisterSessionServiceServer(server, sessionService)
 	proto.RegisterUserServiceServer(server, userService)
 
-	fmt.Println("starting server at :9000")
+	fmt.Println("starting server at :8080")
 
 	err = server.Serve(lis)
 	if err != nil {

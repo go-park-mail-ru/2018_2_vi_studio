@@ -71,7 +71,18 @@ func (sh *SessionHandler) Create(w http.ResponseWriter, r *http.Request) {
 		Password: request.Password,
 	})
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+		body, err := NewError("Incorrect username or password").MarshalJSON()
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusForbidden)
+		_, err = w.Write(body)
+		if err != nil {
+			middleware.Logger(r.Context()).Error(err.Error())
+		}
 		return
 	}
 
@@ -102,7 +113,7 @@ func (sh *SessionHandler) Create(w http.ResponseWriter, r *http.Request) {
 		Name:     "access_token",
 		Value:    accessToken,
 		HttpOnly: true,
-		Secure:   false,
+		Secure:   true,
 		Path:     "/",
 	})
 
@@ -129,7 +140,7 @@ func (sh *SessionHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "access_token",
 		HttpOnly: true,
-		Secure:   false,
+		Secure:   true,
 		Path:     "/",
 		Expires:  time.Unix(0, 0),
 	})

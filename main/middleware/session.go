@@ -41,7 +41,7 @@ func SessionMW(handlerFunc http.HandlerFunc, service proto.SessionServiceClient)
 					Name:     "anonym_token",
 					Value:    anonymToken.String(),
 					HttpOnly: true,
-					Secure:   false,
+					Secure:   true,
 					Path:     "/",
 				})
 			}
