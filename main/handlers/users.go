@@ -78,9 +78,7 @@ func (uh *UsersHandler) Create(w http.ResponseWriter, r *http.Request) {
 		Password: request.Password,
 	})
 	if err == nil {
-		body, err := CreateUserResponse{
-			// TODO: write some
-		}.MarshalJSON()
+		body, err := CreateUserResponse{}.MarshalJSON()
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)

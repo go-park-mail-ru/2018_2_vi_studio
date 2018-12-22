@@ -74,5 +74,6 @@ func (uah *UserAvatarHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	_, err = w.Write([]byte(`{"status":"ok"}`))
 	w.WriteHeader(http.StatusOK)
 }
