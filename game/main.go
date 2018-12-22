@@ -17,7 +17,7 @@ type AuthServices struct {
 
 func main() {
 	grcpConn, err := grpc.Dial(
-		"127.0.0.1:9000",
+		"127.0.0.1:8080",
 		grpc.WithInsecure(),
 	)
 	if err != nil {
